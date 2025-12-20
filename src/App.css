@@ -1,42 +1,166 @@
-#root {
-  max-width: 1280px;
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #eaf7fb;
+}
+
+/* PAGE */
+.page {
+  padding: 40px 0;
+}
+
+/* CONTAINER */
+.container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 48px;
+  margin: 0;
+}
+
+.header p {
+  color: #555;
+}
+
+.fan {
+  font-size: 34px;
+}
+
+/* CARD GROUP CENTERING (THIS IS THE KEY) */
+.cards-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* TOP CARDS */
+.top-cards {
+  display: grid;
+  grid-template-columns: 320px 500px 320px;
+  gap: 25px;
+}
+
+
+/* CARD */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+/* TEMP */
+.temp-box {
+  background: #FFBDBD;
+  padding: 22px;
+  border-radius: 10px;
+  margin: 16px 0;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.temp-value {
+
+  color: #AC0C0C;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 34px;
+  font-weight: bold;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.zones {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.blue1 { color: #1C17AA; font-weight: bold; }
+.green1  { color: #208A1E; font-weight: bold; }
+.yellow1 { color: #F0CE37; font-weight: bold; }
+.orange1 { color: #F4900D; font-weight: bold; }
+.red1 { color: #C61313; font-weight: bold; }
+
+/* FAN */
+.center {
+  text-align: center;
+}
+
+
+.fan-value {
+  font-size: 42px;
+  font-weight: bold;
+  color: #AC0C0C;
+}
+
+.fan-sub {
+  font-size: 12px;
+  color: #C61313;
+  margin-bottom: 16px;
+  font-weight: bold;
+}
+
+.fan-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.fan-buttons button {
+  flex: 1;
+  padding: 10px 4px;
+  border-radius: 8px;
+  border: none;
+  background: #eee;
+}
+
+.fan-buttons .active {
+  background: #d9d9d9;
+  font-weight: bold;
+}
+
+
+
+/* LOG */
+.log {
+  height: 42px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.green { background: #D0FECF; }
+.blue { background: #C2ECFC; }
+.yellow { background: #FCF0BD; }
+.red { background: #FAC8C8; }
+
+/* HISTORY */
+.history {
+  margin: 40px auto 0;
+  max-width: 1000px;
+}
+
+.chart-placeholder {
+  height: 280px;
+  background: #f4f6f8;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .top-cards {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
