@@ -162,9 +162,11 @@ const chartOptions = {
 
         {/* HEADER */}
         <header className="header">
-          <h1>
-            presk<span className="fan">🌀</span>
-          </h1>
+          <img
+            src="/logo.svg"
+            alt="Logo"
+            className="logo"
+          />
           <p>IoT Temperature-Based Fan Control System</p>
         </header>
 
@@ -182,17 +184,13 @@ const chartOptions = {
 
               <div className="zones">
                 <div>
-                  <p className="blue1">Cool (&lt;20°C)</p>
-                  <p className="green1">20–25°C</p>
-                  <p className="yellow1">25–30°C</p>
-                  <p className="orange1">30–35°C</p>
+                  <p className="blue1">Cool (&lt;20°C - 24°C)</p>
+                  <p className="orange1">25–35°C</p>
                   <p className="red1">&gt;35°C</p>
                 </div>
                 <div>
                   <p><b>Fan OFF</b></p>
-                  <p><b>Fan LOW</b></p>
                   <p><b>Fan MEDIUM</b></p>
-                  <p><b>Fan HIGH</b></p>
                   <p><b>Fan MAX</b></p>
                 </div>
               </div>
@@ -211,19 +209,23 @@ const chartOptions = {
                 <button onClick={() => setFanManual(0)}>
                   0%<br /><span>OFF</span>
                 </button>
-                <button onClick={() => setFanManual(25)}>
-                  25%<br /><span>LOW</span>
-                </button>
                 <button onClick={() => setFanManual(50)}>
                   50%<br /><span>MEDIUM</span>
-                </button>
-                <button onClick={() => setFanManual(75)}>
-                  75%<br /><span>HIGH</span>
                 </button>
                 <button onClick={() => setFanManual(100)}>
                   100%<br /><span>MAX</span>
                 </button>
               </div>
+
+              <div className="fan-buttons">
+                <button onClick={() => setFanManual(fanSpeed)}>
+                  <span>MANUAL</span>
+                </button>
+                <button onClick={() => setFanAutomatic(50)}>
+                  <span>AUTO</span>
+                </button>
+              </div>
+
             </div>
 
             {/* ACTIVITY LOG */}

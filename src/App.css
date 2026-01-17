@@ -1,6 +1,5 @@
 * {
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
 }
 
 body {
@@ -25,9 +24,9 @@ body {
   margin-bottom: 40px;
 }
 
-.header h1 {
-  font-size: 48px;
-  margin: 0;
+.logo {
+  width: 180px;
+  max-width: 100%;
 }
 
 .header p {
@@ -85,8 +84,6 @@ body {
 }
 
 .blue1 { color: #1C17AA; font-weight: bold; }
-.green1  { color: #208A1E; font-weight: bold; }
-.yellow1 { color: #F0CE37; font-weight: bold; }
 .orange1 { color: #F4900D; font-weight: bold; }
 .red1 { color: #C61313; font-weight: bold; }
 
@@ -112,6 +109,7 @@ body {
 .fan-buttons {
   display: flex;
   gap: 6px;
+  margin-bottom: 5px;
 }
 
 .fan-buttons button {
@@ -120,6 +118,7 @@ body {
   border-radius: 8px;
   border: none;
   background: #eee;
+  color: #333;
 }
 
 .fan-buttons .active {
@@ -143,6 +142,7 @@ body {
 .yellow { background: #FCF0BD; }
 .red { background: #FAC8C8; }
 .orange{ background: #e7c69d; }
+
 /* HISTORY */
 .history {
   margin: 40px auto 0;
