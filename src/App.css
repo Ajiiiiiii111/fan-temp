@@ -137,6 +137,17 @@ body {
   font-size: 12px;
 }
 
+.log-item {
+  background: #e8c799;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  width: fit-content;
+  display: block;
+}
+
+
 .green { background: #D0FECF; }
 .blue { background: #C2ECFC; }
 .yellow { background: #FCF0BD; }

@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { db } from "./firebase";
 import { ref, onValue, set } from "firebase/database";
 import {
@@ -34,94 +34,107 @@ export default function App() {
     speeds: [],
   });
 
-  let latestFanSpeed = fanSpeed; // keep fresh speed for chart
+  // holds latest fanSpeed even between renders
+  const fanSpeedRef = useRef(0);
 
-  // Updated ranges
-  const getLogInfo = (temp) => {
-    if (temp <= 35) return { color: "blue", label: "Fan OFF" };
-    if (temp <= 39) return { color: "orange", label: "Fan MEDIUM" };
-    return { color: "red", label: "Fan MAX" };
+  const getLogInfo = (temp, speed) => {
+    if (speed === 0) return { mode: "OFF" };
+    if (speed === 50) return { mode: "MEDIUM" };
+    return { mode: "MAX" };
   };
 
   useEffect(() => {
     const tempRef = ref(db, "sensor/temperature");
     const fanRef = ref(db, "fan");
 
-    // FAN LISTENER FIRST
+    // Listen for FAN changes first
     const unsubFan = onValue(fanRef, (snapshot) => {
       const data = snapshot.val();
       if (!data) return;
 
-      latestFanSpeed = data.speed ?? 0;
-      setFanSpeed(latestFanSpeed);
+      const speed = data.speed ?? 0;
+      fanSpeedRef.current = speed; // store latest speed
+      setFanSpeed(speed);
       setFanMode(data.mode ?? "auto");
+
+      // push to graph when fan changes
+      const time = new Date().toLocaleTimeString();
+      setHistory((prev) => ({
+        labels: [...prev.labels, time].slice(-10),
+        temps: [...prev.temps, temperature].slice(-10),
+        speeds: [...prev.speeds, speed].slice(-10),
+      }));
     });
 
-    // TEMP LISTENER SECOND
+    // Listen for TEMP changes second
     const unsubTemp = onValue(tempRef, (snapshot) => {
       const temp = snapshot.val();
       if (temp === null) return;
 
       setTemperature(temp);
 
-      setHistory((prev) => {
-        const time = new Date().toLocaleTimeString();
-        return {
-          labels: [...prev.labels, time].slice(-10),
-          temps: [...prev.temps, temp].slice(-10),
-          speeds: [...prev.speeds, latestFanSpeed].slice(-10),
-        };
-      });
+      const speed = fanSpeedRef.current;
+      const info = getLogInfo(temp, speed);
+      const time = new Date().toLocaleTimeString();
 
-      const info = getLogInfo(temp);
+      // Update activity logs
       setActivityLogs((prev) => {
-        const newLog = {
-          temp,
-          label: info.label,
-          color: info.color,
-          time: new Date().toLocaleTimeString(),
-        };
+        const newLog = { temp, mode: info.mode, time };
         return [newLog, ...prev].slice(0, 3);
       });
+
+      // Update chart with temp + speed every tick
+      setHistory((prev) => ({
+        labels: [...prev.labels, time].slice(-10),
+        temps: [...prev.temps, temp].slice(-10),
+        speeds: [...prev.speeds, speed].slice(-10),
+      }));
     });
 
     return () => {
       unsubTemp();
       unsubFan();
     };
-  }, []);
+  }, [temperature]);
 
-  // Manual Mode
+  // Manual mode
   const setFanManual = (speed) => {
     set(ref(db, "fan"), { speed, mode: "manual" });
-
-    // Instant local update so chart reacts immediately
+    fanSpeedRef.current = speed;
     setFanSpeed(speed);
 
-    // Add to history
-    setHistory((prev) => {
-      const time = new Date().toLocaleTimeString();
-      return {
-        labels: [...prev.labels, time].slice(-10),
-        temps: [...prev.temps, temperature].slice(-10),
-        speeds: [...prev.speeds, speed].slice(-10),
-      };
+    const time = new Date().toLocaleTimeString();
+    const info = getLogInfo(temperature, speed);
+
+    setActivityLogs((prev) => {
+      const newLog = { temp: temperature, mode: info.mode, time };
+      return [newLog, ...prev].slice(0, 3);
     });
+
+    setHistory((prev) => ({
+      labels: [...prev.labels, time].slice(-10),
+      temps: [...prev.temps, temperature].slice(-10),
+      speeds: [...prev.speeds, speed].slice(-10),
+    }));
   };
 
-  // Auto Mode
+  // Auto mode
   const setFanAuto = () => {
-    set(ref(db, "fan"), { speed: fanSpeed, mode: "auto" });
+    set(ref(db, "fan"), { speed: fanSpeedRef.current, mode: "auto" });
 
-    // Add point to graph for mode switch
-    setHistory((prev) => {
-      const time = new Date().toLocaleTimeString();
-      return {
-        labels: [...prev.labels, time].slice(-10),
-        temps: [...prev.temps, temperature].slice(-10),
-        speeds: [...prev.speeds, fanSpeed].slice(-10),
-      };
+    const time = new Date().toLocaleTimeString();
+    const info = getLogInfo(temperature, fanSpeedRef.current);
+
+    setActivityLogs((prev) => {
+      const newLog = { temp: temperature, mode: info.mode, time };
+      return [newLog, ...prev].slice(0, 3);
     });
+
+    setHistory((prev) => ({
+      labels: [...prev.labels, time].slice(-10),
+      temps: [...prev.temps, temperature].slice(-10),
+      speeds: [...prev.speeds, fanSpeedRef.current].slice(-10),
+    }));
   };
 
   const chartData = {
@@ -162,12 +175,12 @@ export default function App() {
         <div className="cards-wrapper">
           <section className="top-cards">
 
+            {/* TEMP */}
             <div className="card">
               <h3>Current Temperature</h3>
               <div className="temp-box">
                 <span className="temp-value">{temperature}°C</span>
               </div>
-
               <div className="zones">
                 <div>
                   <p className="blue1">Cool (&lt;= 35°C)</p>
@@ -182,10 +195,11 @@ export default function App() {
               </div>
             </div>
 
+            {/* FAN CONTROL */}
             <div className="card center fan-card">
               <h3>Fan Speed Control</h3>
               <div className="fan-value">{fanSpeed}%</div>
-              <p className="fan-sub">Mode: {(fanMode || "auto").toUpperCase()}</p>
+              <p className="fan-sub">Mode: {fanMode.toUpperCase()}</p>
 
               <div className="fan-buttons">
                 <button onClick={() => setFanManual(0)}>0%<br /><span>OFF</span></button>
@@ -199,12 +213,12 @@ export default function App() {
               </div>
             </div>
 
+            {/* ACTIVITY LOG */}
             <div className="card">
               <h3>Activity Log</h3>
               {activityLogs.map((log, i) => (
-                <div key={i} className={`log ${log.color}`}>
-                  Temperature changed to {log.temp}°C ({log.label})
-                  <span>{log.time}</span>
+                <div key={i} className="log-item">
+                  Temperature changed to {log.temp.toFixed(2)}°C (Fan {log.mode}) {log.time}
                 </div>
               ))}
             </div>
